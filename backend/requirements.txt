@@ -1,0 +1,8 @@
+flask
+flask-cors
+sqlalchemy
+flask_sqlalchemy
+pandas
+openpyxl
+requests
+# tkinter is part of the standard library and should not be listed here

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitting Area Visualization Prototype</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        .shelf, .pallets { display: flex; flex-direction: row; margin-bottom: 2em; }
+        .column { display: flex; flex-direction: column; margin-right: 1em; }
+        .slot, .pallet { width: 60px; height: 60px; border: 1px solid #aaa; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; background: #f8f8f8; position: relative; }
+        .kit { width: 40px; height: 40px; background: #222; border-radius: 4px 4px 8px 8px; position: absolute; top: 10px; left: 10px; }
+        .kit-lid { width: 40px; height: 10px; background: gold; border-radius: 4px 4px 0 0; position: absolute; top: 0; left: 10px; }
+        .status-indicator { width: 12px; height: 12px; border-radius: 50%; position: absolute; bottom: 4px; right: 4px; border: 1px solid #fff; }
+        .empty { background: #eee; }
+        .label { font-size: 0.8em; position: absolute; bottom: 2px; left: 2px; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Kitting Area Visualization Prototype</h1>
+    <div id="shelves"></div>
+    <div id="pallets"></div>
+    <script>
+        // Example data for prototype
+        const kits = [
+            { kit_number: 1, location: 'Row 1, Col 1', status: 'Ready', status_color: 'green' },
+            { kit_number: 6, location: 'Row 1, Col 6', status: 'In Progress', status_color: 'yellow' },
+            { kit_number: 17, location: 'Row 2, Col 7', status: 'Issue', status_color: 'red' },
+            { kit_number: 41, location: 'Pallet 41', status: 'Ready', status_color: 'green' }
+        ];
+        // Layout constants
+        const rows = 5; // Row 0 not used
+        const cols = 10;
+        const shelfKits = Array.from({ length: rows }, () => Array(cols).fill(null));
+        // Place kits in shelf grid
+        kits.forEach(kit => {
+            if (kit.kit_number <= 40) {
+                // Calculate row/col (Row 1 = index 0, Col 1 = index 0)
+                let kitIdx = kit.kit_number - 1;
+                let row = Math.floor(kitIdx / cols);
+                let col = kitIdx % cols;
+                shelfKits[row][col] = kit;
+            }
+        });
+        // Render shelves
+        const shelvesDiv = document.getElementById('shelves');
+        for (let row = 0; row < rows; row++) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'shelf';
+            for (let col = 0; col < cols; col++) {
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'slot';
+                if (row === 0) {
+                    slotDiv.classList.add('empty');
+                } else if (shelfKits[row][col]) {
+                    const kit = shelfKits[row][col];
+                    const kitDiv = document.createElement('div');
+                    kitDiv.className = 'kit';
+                    const lidDiv = document.createElement('div');
+                    lidDiv.className = 'kit-lid';
+                    const statusDiv = document.createElement('div');
+                    statusDiv.className = 'status-indicator';
+                    statusDiv.style.background = kit.status_color;
+                    slotDiv.appendChild(kitDiv);
+                    slotDiv.appendChild(lidDiv);
+                    slotDiv.appendChild(statusDiv);
+                    const label = document.createElement('span');
+                    label.className = 'label';
+                    label.textContent = `#${kit.kit_number}`;
+                    slotDiv.appendChild(label);
+                } else {
+                    slotDiv.classList.add('empty');
+                }
+                rowDiv.appendChild(slotDiv);
+            }
+            shelvesDiv.appendChild(rowDiv);
+        }
+        // Render pallets
+        const palletsDiv = document.getElementById('pallets');
+        palletsDiv.className = 'pallets';
+        for (let i = 41; i <= 50; i++) {
+            const palletDiv = document.createElement('div');
+            palletDiv.className = 'pallet slot';
+            const kit = kits.find(k => k.kit_number === i);
+            if (kit) {
+                const kitDiv = document.createElement('div');
+                kitDiv.className = 'kit';
+                const lidDiv = document.createElement('div');
+                lidDiv.className = 'kit-lid';
+                const statusDiv = document.createElement('div');
+                statusDiv.className = 'status-indicator';
+                statusDiv.style.background = kit.status_color;
+                palletDiv.appendChild(kitDiv);
+                palletDiv.appendChild(lidDiv);
+                palletDiv.appendChild(statusDiv);
+                const label = document.createElement('span');
+                label.className = 'label';
+                label.textContent = `#${kit.kit_number}`;
+                palletDiv.appendChild(label);
+            } else {
+                palletDiv.classList.add('empty');
+            }
+            palletsDiv.appendChild(palletDiv);
+        }
+    </script>
+</body>
+</html>
